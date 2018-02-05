@@ -243,3 +243,33 @@ Now use docker container stop to end the process, using the CONTAINER ID, like s
 need to know how to push to registries when you want to deploy containers to production. upload our built image and run it somewhere else
 
 A registry is a collection of repositories, and a repository is a collection of images—sort of like a GitHub repository, except the code is already built. An account on a registry can create many repositories. The docker CLI uses Docker’s public registry by default.
+
+
+                                                            To set up registry
+
+https://cloud.docker.com/
+make an account
+
+    docker login
+
+Log in to the Docker public registry on your local machine.
+
+    docker tag image username/repository:tag
+
+The notation for associating a local image with a repository on a registry is username/repository:tag. The tag is optional, but recommended, since it is the mechanism that registries use to give Docker images a version.
+
+Give the repository and tag meaningful names for the context, such as get-started:part2. This puts the image in the get-started repository and tag it as part2.
+
+    docker image ls
+
+to see it
+
+
+    docker push username/repository:tag
+
+to publish
+    
+From now on, you can use docker run and run your app on any machine with this command: If the image isn’t available locally on the machine, Docker pulls it from the repository.
+
+    docker run -p 4000:80 username/repository:tag
+
