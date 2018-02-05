@@ -3,6 +3,7 @@ Docker is a software which provides centralized platform to execute your applica
 
 references
 1.https://docs.docker.com/install/linux/docker-ce/ubuntu/#os-requirements
+2. https://docs.docker.com/get-started/
 
 
 Docker provides the facility to run an application in a isolated environment which is called container.
@@ -97,3 +98,148 @@ verrify you have key with fingerprint 9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0E
         sudo docker run hello-world
 
 SUCCESS
+
+Docker Container and Image
+
+    Docker container runs sepereate but can access things running in other places
+
+    An image is a read-only template with instructions for creating a Docker container. A docker image is described in text file called a Dockerfile, which has a simple, well-defined syntax. An image does not have states and never changes.
+
+    docker run hello-world
+    The above command docker run hello-world has three parts.
+    
+    1) docker: It is docker engine and used to run docker program. It tells to the operating system that you are running docker program.
+    
+    2) run: This subcommand is used to create and run a docker container.
+    
+    3) hello-world: It is a name of an image. You need to specify the name of an image which is to load into the container.
+
+Docker Dockerfile
+
+    dockerfile - A Dockerfile is a text document that contains commands that are used to assemble an image
+    
+    You can use the -f flag with docker build to point to a Dockerfile anywhere in your file system.
+    docker build -f /path/to/a/Dockerfile
+
+    Instructions
+    
+    Docker runs instructions of Dockerfile in top to bottom order. The first instruction must be FROM in order to specify the Base Image.
+
+
+    FROM - This instruction is used to set the Base Image for the subsequent instructions. A valid Dockerfile must have FROM as its first instruction.
+
+        FROM ubuntu
+
+    LABEL - We can add labels to an image to organize images of our project. We need to use LABEL instruction to set label for the image.
+
+        LABEL vendorl = "JavaTpoint"
+
+    RUN - This instruction is used to execute any command of the current image.
+
+        RUN /bin/bash -c 'source $HOME/.bashrc; echo $HOME'
+
+    CMD - This is used to execute application by the image. We should use CMD always in the following form
+    
+        CMD ["executable", "param1", "param2"?]
+
+    COPY - This instruction is used to copy new files or directories from source to the filesystem of the container at the destination.
+
+        COPY abc/ /xyz
+
+
+        --The source path must be inside the context of the build, docker does not know about external directories
+
+
+    WORKDIR -The WORKDIR is used to set the working directory for any RUN, CMD and COPY instruction that follows it     in the Dockerfile. If work directory does not exist, it will be created by default.
+        We can use WORKDIR multiple times in a Dockerfile.
+
+
+        WORKDIR /var/www/html
+
+
+Docker Java Application Example
+
+     mkdir  java-docker-app
+        
+cant use https://www.javatpoint.com/docker-java-example, non compatible
+
+2.
+    
+
+## List Docker CLI commands
+docker
+docker container --help
+
+## Display Docker version and info
+docker --version
+docker version
+docker info
+
+## Excecute Docker image
+docker run hello-world
+
+## List Docker images
+docker image ls
+
+## List Docker containers (running, all, all in quiet mode)
+docker container ls
+docker container ls -all
+docker container ls -a -q
+        
+
+With Docker, scaling your application is a matter of spinning up new executables, not running heavy VM hosts.
+
+using container
+
+    make a dir make a dockerfile inside it and add dockerfile commands
+
+    proxys can block things use this code to enable view before the call to pip
+
+    --------------------------------------------------------------
+    # Set proxy server, replace host:port with values for your servers
+    ENV http_proxy host:port
+    ENV https_proxy host:port
+
+    --------------------------------------------------------------
+
+
+    in /home/autospark/My_Computer/Docker/docker-python-app
+    in app.py docker is looking for redis but redis is not in the system
+    but you have setup the app
+
+    docker build -t friendlyhello .
+
+-t has a friendly name
+
+    docker images
+
+where your images are
+
+    docker run -p 4000:80 friendlyhello
+
+Run the app, mapping your machine’s port 4000 to the container’s published port 80 using -p
+
+Python is serving your app at http://0.0.0.0:80. But that message is coming from inside the container, which doesn’t know you mapped port 80 of that container to 4000, making the correct URL http://localhost:4000.
+
+    curl http://localhost:4000
+
+do this to see result in cmd
+
+
+This port remapping of 4000:80 is to demonstrate the difference between what you EXPOSE within the Dockerfile, and what you publish using docker run -p.
+
+
+    docker run -d -p 4000:80 friendlyhello
+    docker container ls
+
+run the app in the background, in detached mode:
+You get the long container ID for your app and then are kicked back to your terminal. Your container is running in the background. You can also see the abbreviated container ID with docker container ls (and both work interchangeably when running commands):
+
+    docker container stop [container_id]
+
+Now use docker container stop to end the process, using the CONTAINER ID, like so:
+
+
+need to know how to push to registries when you want to deploy containers to production. upload our built image and run it somewhere else
+
+A registry is a collection of repositories, and a repository is a collection of images—sort of like a GitHub repository, except the code is already built. An account on a registry can create many repositories. The docker CLI uses Docker’s public registry by default.
