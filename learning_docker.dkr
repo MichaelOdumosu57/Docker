@@ -1,0 +1,99 @@
+learning docker
+Docker is a software which provides centralized platform to execute your application. It wraps software components into a complete standardized unit which contains everything require to run.
+
+references
+1.https://docs.docker.com/install/linux/docker-ce/ubuntu/#os-requirements
+
+
+Docker provides the facility to run an application in a isolated environment which is called container.
+
+--- Docker container is not any specific platform. It can run on any computer, on any infrastructure and in any cloud.
+
+Docker Engine
+    
+    client-server app that has
+
+    daemon- a long running server process
+    REST API - talks to daemon and tells it what to do
+    command line client interface
+
+    it manages
+    networks, containers, images and data volumes
+
+Docker Features
+
+    configures easily and fast becuase it does not depend on infrastructure
+    reduce resources needed to execute
+     Each container is independent to another and allows us to execute any kind of application.
+    swarm - It is a clustering and scheduling tool for Docker containers.
+    It routes the incoming requests for published ports on available nodes to an active container. This feature enables the connection even if there is no task is running on the node.
+    Services is a list of tasks that lets us specify the state of the container inside a cluster
+    It allows us to save secrets into the swarm itself and then choose to give services access to certain secrets.
+
+Docker Architecture
+
+    Docker_Host: It contains Containers, Images, and Docker daemon. It provides complete environment to execute and run your application.
+    Client: Docker provides Command Line Interface (CLI) tools to client to interact with Docker daemon. Client can build, run and stop application. Client can also interact to Docker_Host remotely.
+     Registry: It is global repository of images. You can access and use these images to run your application in Docker environment.
+
+    docker daemon
+    It is a process which is used to listen for Docker API requests. It also manages Docker objects like: images, container, network etc. A daemon can also communicate with other daemons to manage Docker services.
+
+
+    The Docker client
+    The Docker client is the primary way that many Docker users interact with Docker. When we use commands such as docker run, the client sends these commands to docker d, which carries them out. The docker command uses the Docker API.
+
+Docker Installation
+
+    for ubuntu 16.04 xenial LTS
+        only 64 bit
+        requires linux kernel > 3.10
+
+        to check kernel type in uname -r
+
+    to install
+        sudo apt-get update
+        sudo apt-get install apt-transport-https ca-certificates
+
+tried to copy and paste sudo apt-key adv \
+--keyserver hkp://ha.pool.sks-keyservers.net:80 \
+--recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+
+got this
+
+Executing: /tmp/tmp.DGR8vsVyRO/gpg.1.sh
+gpg: can't open ` '
+
+tried this
+    sudo apt-key adv \ --keyserver hkp://ha.pool.sks-keyservers.net:80 \ --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+got
+usage: gpg [options] [filename]
+    
+    tried this
+
+    gpg is not used right , have to do some research
+    
+    DID THIS INSTEAD
+
+1/.
+        sudo apt-get remove docker docker-engine docker.io
+        sudo apt-get update
+        sudo apt-get install \
+            apt-transport-https \
+            ca-certificates \
+            curl \
+            software-properties-common
+         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+verrify you have key with fingerprint 9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88
+        
+        sudo apt-key fingerprint 0EBFCD88
+        sudo add-apt-repository \
+            "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+            $(lsb_release -cs) \
+            stable"
+        sudo apt-get update
+        sudo apt-get install docker-ce
+        sudo docker run hello-world
+
+SUCCESS
