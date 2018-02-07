@@ -4,6 +4,7 @@ Docker is a software which provides centralized platform to execute your applica
 references
 1.https://docs.docker.com/install/linux/docker-ce/ubuntu/#os-requirements
 2. https://docs.docker.com/get-started/
+3 https://docs.docker.com/compose/install/
 
 
 Docker provides the facility to run an application in a isolated environment which is called container.
@@ -239,6 +240,8 @@ You get the long container ID for your app and then are kicked back to your term
 
 Now use docker container stop to end the process, using the CONTAINER ID, like so:
 
+folder  /home/autospark/My_Computer/Docker/docker-python-app
+
 
 need to know how to push to registries when you want to deploy containers to production. upload our built image and run it somewhere else
 
@@ -247,29 +250,116 @@ A registry is a collection of repositories, and a repository is a collection of 
 
                                                             To set up registry
 
-https://cloud.docker.com/
 make an account
-
-    docker login
+https://cloud.docker.com/
 
 Log in to the Docker public registry on your local machine.
+    docker login
 
-    docker tag image username/repository:tag
 
 The notation for associating a local image with a repository on a registry is username/repository:tag. The tag is optional, but recommended, since it is the mechanism that registries use to give Docker images a version.
 
 Give the repository and tag meaningful names for the context, such as get-started:part2. This puts the image in the get-started repository and tag it as part2.
 
-    docker image ls
+    docker tag image username/repository:tag
+
+
 
 to see it
 
+    docker image ls
 
-    docker push username/repository:tag
+
 
 to publish
     
+    docker push username/repository:tag
+
 From now on, you can use docker run and run your app on any machine with this command: If the image isn’t available locally on the machine, Docker pulls it from the repository.
 
     docker run -p 4000:80 username/repository:tag
 
+
+
+
+                                            Get Started, Part 3: Services
+    
+    need docker compose
+3
+    Compose is a tool for defining and running multi-container Docker applications
+    
+    download the Docker Compose binary from the Compose repository release page on GitHub.
+
+        sudo curl -L https://github.com/docker/compose/releases/download/1.19.0-rc3/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    
+    apply execution to binary
+    
+        sudo chmod +x /usr/local/bin/docker-compose
+    
+    installation test
+    
+        docker-compose --version
+
+Services
+In a distributed application, different pieces of the app are called “services.”
+
+to manage services you just need a yml file
+
+    make a docker-compose.yml whereever, replaced that image in your personal registry in the info in the example
+
+    it tells docker to
+
+        >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Pull the image we uploaded in step 2 from the registry.
+
+Run 5 instances of that image as a service called web, limiting each one to use, at most, 10% of the CPU (across all cores), and 50MB of RAM.
+
+Immediately restart containers if one fails.
+
+Map port 80 on the host to web’s port 80.
+
+Instruct web’s containers to share port 80 via a load-balanced network called webnet. (Internally, the containers themselves publish to web’s port 80 at an ephemeral port.)
+
+Define the webnet network with the default settings (which is a load-balanced overlay network).
+
+        >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+---------------------------run your new load-balanced app
+
+    docker swarm init
+
+give app a name getstartedlab
+
+    sudo docker stack deploy -c docker-compose.yml getstartedlab
+
+see the load balanced app as a service
+
+    sudo docker service ls
+
+A single container running in a service is called a task. Tasks are given unique IDs that numerically increment, up to the number of replicas you defined in docker-compose.yml. List the tasks for your service:
+
+    sudo docker service ps getstartedlab_web
+    OR
+    docker container ls -q
+
+go to browser and refresh several times to see the result
+
+container id changes matching id from docker container ls -q
+
+--------------------------Scale the app
+
+You can scale the app by changing the replicas value in docker-compose.yml,
+docker changes in place without having to do anything too see result docker container ls -q
+
+-----------------------Take down the app and the swarm
+
+Take the app down with docker stack rm:
+
+    docker stack rm getstartedlab
+
+take down swarm
+    
+    docker swarm leave --force
+
+
+    FOLDER: docker_services
