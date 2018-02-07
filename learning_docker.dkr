@@ -340,7 +340,7 @@ A single container running in a service is called a task. Tasks are given unique
 
     sudo docker service ps getstartedlab_web
     OR
-    docker container ls -q
+    sudo docker container ls -q
 
 go to browser and refresh several times to see the result
 
@@ -363,3 +363,120 @@ take down swarm
 
 
     FOLDER: docker_services
+
+
+                                    Get Started, Part 4: Swarms
+
+Multi-container, multi-machine applications are made possible by joining multiple machines into a “Dockerized” cluster called a swarm.
+
+A swarm is a group of machines that are running Docker and joined into a cluster. After that has happened, you continue to run the Docker commands you’re used to, but now they are executed on a cluster by a swarm manager.
+
+After joining a swarm, they are  called  nodes.
+
+swarm managers have different ways of running things
+
+basically your computer can turn into a control for a whole set of computers
+
+
+--------------------------Set up your swarm
+
+to become a manager
+
+    docker swarm init
+
+to join a swarm
+
+    docker swarm join
+
+you can try this out by using virtual machines
+
+    sudo docker-machine create --driver virtualbox myvm1
+    sudo docker-machine create --driver virtualbox myvm2
+
+----
+however myvm1 shoes up as not running, obviously because the vt-x/ functionality was disabled in bios
+so im using myvm3 as a replacement
+---
+
+command to list the machines and get their IP addresses
+
+    sudo docker-machine ls
+
+send command to VM
+
+    docker-machine ssh [VM MACHINE NAME]
+if trouble
+    docker-machine --native-ssh ssh  [VM MACHINE NAME]
+docker-machine --native-ssh ssh  myvm2 "docker swarm init --advertise-addr <myvm2 ip>"
+
+got
+sh: syntax error: unexpected end of file
+exit status 2
+
+    made my computer the swarm manager, and made the other vm join me
+
+    sudo docker-machine --native-ssh ssh [VM MACHINE] "sudo docker swarm join --token SWMTKN-1-4n8dosttl2fljalp9nmvvz3wi95xbvt0ffn1socerbvxbbdkzf-57fov9ovaplmwanme4r7owilr 192.168.1.4:2377"
+
+
+TIP: never used ports 2377,2376
+
+if swarm was the manager you run commands through it using
+
+    docker-machine --native-ssh  ssh [VM MACHINE NAME] "[command] "
+
+to see the activity from the swarm manager run
+    
+    sudo docker node ls
+
+if you want to start over
+
+    docker swarm leave
+
+do what you did in part 3 and deploy your swarm
+
+
+------------------------Configure a docker-machine shell to the swarm manager
+
+This method works better for the next step because it allows you to use your local docker-compose.yml file to deploy the app “remotely” without having to copy it anywhere.
+
+    sudo docker-machine env [VM MACHINE]
+
+    eval $(docker-machine env myvm2)
+
+    but you must be root so start the whole process again
+
+to get out of root
+
+    exit
+
+run to verify its active machine bash is linked to if you see the star on active you in the right
+
+    docker-machine ls
+
+might have to exit and sudo back in and start from the beginning of this division to get it to work
+
+go to the folder containg the -compose.yml and run
+    docker stack deploy -c docker-compose.yml getstartedlab
+
+you see only the nodes in your swarm are manipulating the service request process
+    docker stack ps getstartedlab
+
+adding things is the same only when you want your computers to take on the workload use
+    docker stack deploy
+
+
+-----------------------------Cleanup and reboot
+
+take down the swarm
+    docker stack rm getstartedlab
+
+to unset your ssh vm connection
+    eval $(docker-machine env -u)
+
+If you shut down your local host, Docker machines stops running.To restart a machine that’s stopped, run:
+    docker-machine start [machine-name]
+but results can be
+ Unable to query docker version: Get https://192.168.99.104:2376/v1.15/version: x509: certificate signed by unknown authority
+when i ran sudo docker-machine env myvm1 told me to do this
+    docker-machine regenerate-certs [name]
+but idk what name refers to so ill skip here
