@@ -5,6 +5,7 @@ references
 1.https://docs.docker.com/install/linux/docker-ce/ubuntu/#os-requirements
 2. https://docs.docker.com/get-started/
 3 https://docs.docker.com/compose/install/
+4.https://docs.docker.com/docker-cloud/infrastructure/byoh/
 
 
 Docker provides the facility to run an application in a isolated environment which is called container.
@@ -480,3 +481,77 @@ but results can be
 when i ran sudo docker-machine env myvm1 told me to do this
     docker-machine regenerate-certs [name]
 but idk what name refers to so ill skip here
+
+also when restarting machines, restart in the order you first started or the signing keys will be incorrect for the IP
+
+
+--------------------------------------------------Part 5: Stacks-------------------------------------------------
+
+A stack is a group of interrelated services that share dependencies, and can be orchestrated and scaled together.
+
+
+                             add a free visualizer service
+
+    open up docker-compose.yml and replace the file
+
+a volumes key, giving the visualizer access to the host’s socket file for Docker,
+placement key, ensuring that this service only ever runs on a swarm manager – never a worke
+
+    rerun docker stack deploy -c docker-compose.yml getstartedlab
+
+    look at the vizualizer at port 8080 for the respective IP
+
+The visualizer is a standalone service that can run in any app that includes it in the stack.
+
+
+                            Persist the data (a service that does have a dependency)
+
+    open up docker-compose.yml and replace the file
+
+Redis has an official image in the Docker library and has been granted the short image name of just redis, so no username/repo notation here.
+
+The Redis port, 6379, has been pre-configured by Redis to be exposed from the container to the host, and here in our Compose file we expose it from the host to the world, can use any of swarm node ip to manage redis
+
+redis always runs on the manager, so it’s always using the same filesystem.
+redis accesses an arbitrary directory in the host’s file system as /data inside the container, which is where Redis stores data.
+    this creates  “source of truth”
+The placement constraint you put on the Redis service, ensuring that it always uses the same host.
+The volume you created that lets the container access ./data (on the host) as /data (inside the Redis container). While containers come and go, the files stored on ./data on the specified host persists, enabling continuity.
+
+
+
+
+
+                            Create a ./data directory on the manager:
+            you have to literally make it in the vm using
+            docker-machine --native-ssh  ssh [VM MACHINE NAME] "[command] "
+
+                            run docker stack deploy -c docker-compose.yml getstartedlab
+                           sudo docker stack deploy -c docker-compose.yml getstartedlab
+
+apparentely docker and sudo docker do different things
+while on enb
+sudo docker makes elgesis do the work and it seems to make it a swarm manager at the same time
+
+it seems that redis does not have permission to run under we have to configure this
+playing around it only now sees redis and nothing else
+seems like you have to wait
+                            Run docker service ls to verify that the three services are running as expected.
+
+
+
+-------------------------------------------Part 6: Deploy your app-------------------------------------------------
+
+                    To set up and deploy:
+
+Connect Docker Cloud with your preferred provider, granting Docker Cloud permission to automatically provision and “Dockerize” VMs for you.
+Use Docker Cloud to create your computing resources and create your swarm.
+Deploy your app.
+
+
+//choose    Use the Docker Cloud Agent to bring your own host
+    // error yr linux distro is not tested
+    // went to make an Microsoft azure acct
+    // said my gmail acct was associated with it going to fix that,
+    // made a AWS acct halfway
+    // seems to be that there is scammary on all sides, so this is where my studies of docker ends, I have learned plenty
